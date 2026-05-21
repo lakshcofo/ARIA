@@ -91,8 +91,7 @@ jobs:
           echo "Checking for open ARIA case..."
  
           CASE_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case?sysparm_query=u_external_id=$CORRE…
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case?sysparm_query=u_external_id=$CORRELATION_ID" \-H "Accept: application/json")
  
           CASE_SYS_ID=$(echo "$CASE_RESPONSE" | jq -r '.result[0].sys_id // empty')
  
@@ -226,9 +225,8 @@ jobs:
  
             echo "Updating active signal..."
  
-            SIGNAL_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-
-            "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source?sysparm_query=u_case=$CAS…
+            CASE_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
+            "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source?sysparm_query=u_external_id=$CORRELATION_ID" \-H "Accept: application/json")
  
             SIGNAL_SYS_ID=$(echo "$SIGNAL_RESPONSE" | jq -r '.result[0].sys_id // empty')
  
@@ -293,8 +291,7 @@ jobs:
           CURRENT_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
  
           CASE_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case?sysparm_query=u_external_id=$CORRE…
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case?sysparm_query=u_external_id=$CORRELATION_ID" \-H "Accept: application/json")
  
           CASE_SYS_ID=$(echo "$CASE_RESPONSE" | jq -r '.result[0].sys_id // empty')
  
@@ -314,9 +311,8 @@ jobs:
  
             echo "Resolving signal..."
  
-            SIGNAL_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-
-            "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source?sysparm_query=u_case=$CAS…
+            CASE_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
+            "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source?sysparm_query=u_external_id=$CORRELATION_ID" \-H "Accept: application/json")
  
             SIGNAL_SYS_ID=$(echo "$SIGNAL_RESPONSE" | jq -r '.result[0].sys_id // empty')
  
