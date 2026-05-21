@@ -92,9 +92,9 @@ jobs:
               --arg ext "$CORRELATION_ID" \
               --arg opened "$CURRENT_TIME" \
               --arg url "$PIPELINE_URL" \
-              --arg pipeline "$PIPELINE_NAME" \
               --arg short "GitHub Pipeline Failure - ${{ github.ref_name }}" \
-              --arg desc "$ERROR_MSG" \
+              --arg desc "Pipeline execution failed. See related signal for detailed error." \
+              --arg pipeline "ARIA_MAIN2_PIPELINE" \
               '{
                 u_case_state: $state,
                 u_external_id: $ext,
@@ -173,9 +173,9 @@ jobs:
               --data "$(jq -n \
                 --arg state "monitoring" \
                 --arg url "$PIPELINE_URL" \
-                --arg pipeline "$PIPELINE_NAME" \
+                --arg pipeline "ARIA_MAIN2_PIPELINE" \
                 --arg short "Pipeline still failing" \
-                --arg desc "$ERROR_MSG" \
+                --arg desc "Pipeline still failing - monitoring" \
                 '{
                   u_case_state: $state,
                   u_pipelineid: $pipeline,
