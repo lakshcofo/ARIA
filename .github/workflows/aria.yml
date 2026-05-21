@@ -49,7 +49,7 @@ jobs:
         run: |
           set +e
 
-          CORRELATION_ID="ARIA_MAIN_PIPELINE_${{ github.ref_name }}"
+          CORRELATION_ID="ARIA_MAIN2_PIPELINE_${{ github.ref_name }}"
           CURRENT_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
           PIPELINE_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           PIPELINE_NAME="ARIA_MAIN_PIPELINE"
@@ -197,7 +197,7 @@ jobs:
           SN_USERNAME: ${{ secrets.SN_USERNAME }}
           SN_PASSWORD: ${{ secrets.SN_PASSWORD }}
         run: |
-          CORRELATION_ID="ARIA_MAIN_PIPELINE_${{ github.ref_name }}"
+          CORRELATION_ID="ARIA_MAIN2_PIPELINE_${{ github.ref_name }}"
           CURRENT_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
 
           echo "Pipeline successful. Checking ARIA case for closure..."
