@@ -52,7 +52,7 @@ jobs:
           SN_PASSWORD: ${{ secrets.SN_PASSWORD }}
         run: |
 
-          CORRELATION_ID="ARIA_MAIN1_PIPELINE_${{ github.ref_name }}"
+          CORRELATION_ID="ARIA_MAIN2_PIPELINE_${{ github.ref_name }}"
           CURRENT_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
           PIPELINE_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           GITHUB_RUN_ID="${{ github.run_id }}"
@@ -60,7 +60,7 @@ jobs:
           echo "Checking for open ARIA case..."
 
           CASE_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_case?sysparm_query=u_external_id=$CORRELATION_ID%5Eu_case_state!=closed&sysparm_limit=1&sysparm_fields=sys_id")
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case?sysparm_query=u_external_id=$CORRELATION_ID%5Eu_case_state!=closed&sysparm_limit=1&sysparm_fields=sys_id")
 
           CASE_SYS_ID=$(echo "$CASE_RESPONSE" | jq -r '.result[0].sys_id // empty')
 
@@ -75,7 +75,7 @@ jobs:
           --arg url "$PIPELINE_URL" \
           --arg short "GitHub Pipeline Failure - ${{ github.ref_name }}" \
           --arg desc "Pipeline execution failed. See related signal for detailed error." \
-          --arg pipeline "ARIA_MAIN1_PIPELINE" \
+          --arg pipeline "ARIA_MAIN2_PIPELINE" \
           '{
           u_case_state:$state,
           u_external_id:$ext,
@@ -87,7 +87,7 @@ jobs:
           }')
 
           CASE_RESPONSE=$(curl -s -X POST \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_case" \
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case" \
           -H "Content-Type: application/json" \
           -u "$SN_USERNAME:$SN_PASSWORD" \
           --data "$CASE_PAYLOAD")
@@ -97,7 +97,7 @@ jobs:
           echo "Creating Signal record..."
 
           curl -s -X POST \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_signal_source" \
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source" \
           -H "Content-Type: application/json" \
           -u "$SN_USERNAME:$SN_PASSWORD" \
           --data "$(jq -n \
@@ -121,13 +121,13 @@ jobs:
           echo "Updating existing case → Monitoring..."
 
           curl -s -X PATCH \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_case/$CASE_SYS_ID" \
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case/$CASE_SYS_ID" \
           -H "Content-Type: application/json" \
           -u "$SN_USERNAME:$SN_PASSWORD" \
           --data "$(jq -n \
           --arg state "monitoring" \
           --arg url "$PIPELINE_URL" \
-          --arg pipeline "ARIA_MAIN1_PIPELINE" \
+          --arg pipeline "ARIA_MAIN2_PIPELINE" \
           --arg short "Pipeline still failing" \
           --arg desc "Pipeline still failing - monitoring" \
           '{
@@ -141,13 +141,13 @@ jobs:
           echo "Updating active signal..."
 
           SIGNAL_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_signal_source?sysparm_query=u_case=$CASE_SYS_ID%5Eu_status=active&sysparm_limit=1&sysparm_fields=sys_id")
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source?sysparm_query=u_case=$CASE_SYS_ID%5Eu_status=active&sysparm_limit=1&sysparm_fields=sys_id")
 
           SIGNAL_SYS_ID=$(echo "$SIGNAL_RESPONSE" | jq -r '.result[0].sys_id // empty')
 
           if [ -n "$SIGNAL_SYS_ID" ]; then
           curl -s -X PATCH \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_signal_source/$SIGNAL_SYS_ID" \
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source/$SIGNAL_SYS_ID" \
           -H "Content-Type: application/json" \
           -u "$SN_USERNAME:$SN_PASSWORD" \
           --data "$(jq -n \
@@ -176,11 +176,11 @@ jobs:
           SN_PASSWORD: ${{ secrets.SN_PASSWORD }}
         run: |
 
-          CORRELATION_ID="ARIA_MAIN1_PIPELINE_${{ github.ref_name }}"
+          CORRELATION_ID="ARIA_MAIN2_PIPELINE_${{ github.ref_name }}"
           CURRENT_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
 
           CASE_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_case?sysparm_query=u_external_id=$CORRELATION_ID%5Eu_case_state!=closed&sysparm_limit=1&sysparm_fields=sys_id")
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case?sysparm_query=u_external_id=$CORRELATION_ID%5Eu_case_state!=closed&sysparm_limit=1&sysparm_fields=sys_id")
 
           CASE_SYS_ID=$(echo "$CASE_RESPONSE" | jq -r '.result[0].sys_id // empty')
 
@@ -189,7 +189,7 @@ jobs:
           echo "Closing ARIA case..."
 
           curl -s -X PATCH \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_case/$CASE_SYS_ID" \
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case/$CASE_SYS_ID" \
           -H "Content-Type: application/json" \
           -u "$SN_USERNAME:$SN_PASSWORD" \
           --data "{\"u_case_state\":\"closed\",\"u_closedat\":\"$CURRENT_TIME\",\"u_situation_summary\":\"Pipeline successful\",\"u_situation_details\":\"Pipeline execution completed successfully.\"}"
@@ -197,13 +197,13 @@ jobs:
           echo "Resolving signal..."
 
           SIGNAL_RESPONSE=$(curl -s -u "$SN_USERNAME:$SN_PASSWORD" \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_signal_source?sysparm_query=u_case=$CASE_SYS_ID%5Eu_status=active&sysparm_limit=1&sysparm_fields=sys_id")
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source?sysparm_query=u_case=$CASE_SYS_ID%5Eu_status=active&sysparm_limit=1&sysparm_fields=sys_id")
 
           SIGNAL_SYS_ID=$(echo "$SIGNAL_RESPONSE" | jq -r '.result[0].sys_id // empty')
 
           if [ -n "$SIGNAL_SYS_ID" ]; then
           curl -s -X PATCH \
-          "https://${SN_INSTANCE}.service-now.com/api/now/table/u_aria_signal_source/$SIGNAL_SYS_ID" \
+          "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source/$SIGNAL_SYS_ID" \
           -H "Content-Type: application/json" \
           -u "$SN_USERNAME:$SN_PASSWORD" \
           --data '{"u_status":"resolved"}'
