@@ -69,7 +69,10 @@ jobs:
               --arg short "GitHub Pipeline Failure - ${{ github.ref_name }}" \
               --arg desc "Pipeline execution failed. See related signal for detailed error." \
               --arg pipeline "ARIA_MAIN2_PIPELINE" \
-              '{ u_case_state:$state, u_external_id:$ext, u_opened_at:$opened, u_pipelineid:$pipeline, u_u:$url, u_situation_summary:$short, u_situation_details:$desc }')
+              --arg impact "1" \
+              --arg urgency "2" \
+              --arg decision "proceed" \
+              '{ u_case_state:$state, u_external_id:$ext, u_opened_at:$opened, u_pipelineid:$pipeline, u_u:$url, u_situation_summary:$short, u_situation_details:$desc, u_impact:$impact, u_urgency:$urgency, u_decision:$decision }')
 
             CASE_RESPONSE=$(curl -s -X POST \
               "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case" \
@@ -140,6 +143,7 @@ jobs:
         run: |
           CORRELATION_ID="ARIA_MAIN2_PIPELINE_${{ github.ref_name }}"
           CURRENT_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          PIPELINE_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
           CASE_RESPONSE=$(curl -s -G -u "$SN_USERNAME:$SN_PASSWORD" \
             "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case" \
@@ -151,11 +155,20 @@ jobs:
 
           if [ -n "$CASE_SYS_ID" ] && [ "$CASE_SYS_ID" != "null" ]; then
             echo "Closing ARIA case..."
+
+            CLOSE_PAYLOAD=$(jq -n \
+              --arg state "closed" \
+              --arg closed "$CURRENT_TIME" \
+              --arg url "$PIPELINE_URL" \
+              --arg short "Pipeline successful" \
+              --arg desc "Pipeline execution completed successfully." \
+              '{ u_case_state: $state, u_closedat: $closed, u_u: $url, u_situation_summary: $short, u_situation_details: $desc }')
+
             curl -s -X PATCH \
               "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_case/$CASE_SYS_ID" \
               -H "Content-Type: application/json" \
               -u "$SN_USERNAME:$SN_PASSWORD" \
-              --data "{\"u_case_state\":\"closed\",\"u_closedat\":\"$CURRENT_TIME\",\"u_situation_summary\":\"Pipeline successful\",\"u_situation_details\":\"Pipeline execution completed successfully.\"}"
+              --data "$CLOSE_PAYLOAD"
 
             echo "Resolving signal..."
             SIGNAL_RESPONSE=$(curl -s -G -u "$SN_USERNAME:$SN_PASSWORD" \
@@ -179,4 +192,3 @@ jobs:
       - name: Mark Pipeline Failed
         if: steps.run_app.outputs.exit_code != '0'
         run: exit 1
-
