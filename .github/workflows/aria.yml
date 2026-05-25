@@ -186,11 +186,18 @@ jobs:
             SIGNAL_SYS_ID=$(echo "$SIGNAL_RESPONSE" | jq -r '.result[0].sys_id // empty')
 
             if [ -n "$SIGNAL_SYS_ID" ] && [ "$SIGNAL_SYS_ID" != "null" ]; then
+              SIGNAL_PATCH_PAYLOAD=$(jq -n \
+             --arg src "GitHub" \
+             --arg type "pipeline success" \
+             --arg ext "${{ github.run_id }}" \
+             --arg status "resolved" \
+             '{ u_signal_source:$src, u_signal_type:$type, u_external_id:$ext, u_status:$status }')
+
               curl -s -X PATCH \
-                "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source/$SIGNAL_SYS_ID" \
-                -H "Content-Type: application/json" \
-                -u "$SN_USERNAME:$SN_PASSWORD" \
-                --data '{"u_status":"resolved"}'
+               "https://${SN_INSTANCE}.service-now.com/api/now/table/x_1974103_aria_u_aria_signal_source/$SIGNAL_SYS_ID" \
+               -H "Content-Type: application/json" \
+               -u "$SN_USERNAME:$SN_PASSWORD" \
+               --data "$SIGNAL_PATCH_PAYLOAD"
             fi
           fi
 
