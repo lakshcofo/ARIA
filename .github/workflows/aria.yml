@@ -179,4 +179,4 @@ jobs:
       - name: Mark Pipeline Failed
         if: steps.run_app.outputs.exit_code != '0'
         run: exit 1
-``
+
